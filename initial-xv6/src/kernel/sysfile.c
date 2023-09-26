@@ -508,6 +508,5 @@ sys_pipe(void)
 
 uint64 getreadcount(void)
 {
-  printf("%d\n",readcount);
-  return 0;
+  return readcount;
 }
