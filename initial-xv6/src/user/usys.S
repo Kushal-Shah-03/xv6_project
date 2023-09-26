@@ -110,3 +110,8 @@ waitx:
  li a7, SYS_waitx
  ecall
  ret
+.global getreadcount
+getreadcount:
+ li a7, SYS_getreadcount
+ ecall
+ ret

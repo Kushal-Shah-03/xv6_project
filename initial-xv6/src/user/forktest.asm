@@ -47,7 +47,7 @@ forktest(void)
 
   print("fork test\n");
   3a:	00000517          	auipc	a0,0x0
-  3e:	41650513          	addi	a0,a0,1046 # 450 <waitx+0xa>
+  3e:	41e50513          	addi	a0,a0,1054 # 458 <getreadcount+0xa>
   42:	00000097          	auipc	ra,0x0
   46:	fbe080e7          	jalr	-66(ra) # 0 <print>
 
@@ -71,7 +71,7 @@ forktest(void)
   if(n == N){
     print("fork claimed to work N times!\n");
   64:	00000517          	auipc	a0,0x0
-  68:	3fc50513          	addi	a0,a0,1020 # 460 <waitx+0x1a>
+  68:	40450513          	addi	a0,a0,1028 # 468 <getreadcount+0x1a>
   6c:	00000097          	auipc	ra,0x0
   70:	f94080e7          	jalr	-108(ra) # 0 <print>
     exit(1);
@@ -113,7 +113,7 @@ forktest(void)
 
   print("fork test OK\n");
   b4:	00000517          	auipc	a0,0x0
-  b8:	3fc50513          	addi	a0,a0,1020 # 4b0 <waitx+0x6a>
+  b8:	40450513          	addi	a0,a0,1028 # 4b8 <getreadcount+0x6a>
   bc:	00000097          	auipc	ra,0x0
   c0:	f44080e7          	jalr	-188(ra) # 0 <print>
 }
@@ -125,7 +125,7 @@ forktest(void)
   ce:	8082                	ret
       print("wait stopped early\n");
   d0:	00000517          	auipc	a0,0x0
-  d4:	3b050513          	addi	a0,a0,944 # 480 <waitx+0x3a>
+  d4:	3b850513          	addi	a0,a0,952 # 488 <getreadcount+0x3a>
   d8:	00000097          	auipc	ra,0x0
   dc:	f28080e7          	jalr	-216(ra) # 0 <print>
       exit(1);
@@ -134,7 +134,7 @@ forktest(void)
   e6:	2c4080e7          	jalr	708(ra) # 3a6 <exit>
     print("wait got too many\n");
   ea:	00000517          	auipc	a0,0x0
-  ee:	3ae50513          	addi	a0,a0,942 # 498 <waitx+0x52>
+  ee:	3b650513          	addi	a0,a0,950 # 4a0 <getreadcount+0x52>
   f2:	00000097          	auipc	ra,0x0
   f6:	f0e080e7          	jalr	-242(ra) # 0 <print>
     exit(1);
@@ -820,3 +820,13 @@ waitx:
  448:	00000073          	ecall
  ret
  44c:	8082                	ret
+
+000000000000044e <getreadcount>:
+.global getreadcount
+getreadcount:
+ li a7, SYS_getreadcount
+ 44e:	48dd                	li	a7,23
+ ecall
+ 450:	00000073          	ecall
+ ret
+ 454:	8082                	ret
