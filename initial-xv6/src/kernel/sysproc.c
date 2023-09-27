@@ -108,3 +108,51 @@ sys_waitx(void)
     return -1;
   return ret;
 }
+
+uint64
+sigalarm(void)
+{
+  // fork might work idk
+  // int pid=sys_getpid();
+  uint64 handler;
+  int interval;
+  argint(0, &interval);
+  argaddr(1, &handler);
+  struct proc *p=myproc();
+  if (p->sigticks!=-1)
+  {
+    printf("Recursive call of sigalarm\n");
+    return 0;
+  }
+  else
+  {
+    p->sigticks=interval;
+    p->sighandler=handler;
+  }
+  // int ret=fork();
+  // if (ret==0)
+  // {
+  //   // count n ticks somehow
+  //   // send signal to pid to stop
+  //   // execute fn
+  //   // return signal to pid
+  // }
+  // else
+  // {
+  //   return 0;
+  // }
+  return 0;
+}
+
+uint64
+sigreturn(void)
+{
+  struct proc* p=myproc();
+  memmove(p->trapframe, p->alarmframe, PGSIZE);
+  kfree(p->alarmframe);
+  // p->alarmframe=0;
+  // p->sigticks=-1;
+  p->currticks=0;
+  p->ishandler=0;
+  return p->trapframe->a0;
+}

@@ -28,7 +28,7 @@ int main()
         {
         } // CPU bound process
       }
-      // printf("Process %d finished\n", n);
+      printf("Process %d finished\n", n);
       exit(0);
     }
   }

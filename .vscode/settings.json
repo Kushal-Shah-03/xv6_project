@@ -2,6 +2,8 @@
     "files.associations": {
         "syscall.h": "c",
         "user.h": "c",
-        "sleeplock.h": "c"
+        "sleeplock.h": "c",
+        "proc.h": "c",
+        "defs.h": "c"
     }
 }

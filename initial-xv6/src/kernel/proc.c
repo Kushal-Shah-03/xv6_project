@@ -26,6 +26,12 @@ extern char trampoline[]; // trampoline.S
 // must be acquired before any p->lock.
 struct spinlock wait_lock;
 
+// extern void garbage ();
+// void garbage()
+// {
+//   return;
+// }
+
 // Allocate a page for each process's kernel stack.
 // Map it high in memory, followed by an invalid
 // guard page.
@@ -152,6 +158,10 @@ found:
   p->rtime = 0;
   p->etime = 0;
   p->ctime = ticks;
+  p->sigticks=-1;
+  p->sighandler=0;
+  p->currticks=0;
+  p->ishandler=0;
   return p;
 }
 

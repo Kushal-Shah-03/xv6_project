@@ -80,7 +80,23 @@ void usertrap(void)
 
   // give up the CPU if this is a timer interrupt.
   if (which_dev == 2)
+  {
+    if (myproc()->sigticks!=-1)
+    {
+      struct proc *p=myproc();
+      p->currticks++;
+      if (p->ishandler==0&&p->currticks>=p->sigticks)
+      {
+        p->currticks=0;
+        struct trapframe *trapf = kalloc();
+        memmove(trapf, p->trapframe, PGSIZE);
+        p->alarmframe = trapf;
+        p->trapframe->epc=p->sighandler;
+        p->ishandler=1;
+      }
+    }
     yield();
+  }
 
   usertrapret();
 }
