@@ -26,11 +26,6 @@ extern char trampoline[]; // trampoline.S
 // must be acquired before any p->lock.
 struct spinlock wait_lock;
 
-// extern void garbage ();
-// void garbage()
-// {
-//   return;
-// }
 
 // Allocate a page for each process's kernel stack.
 // Map it high in memory, followed by an invalid
@@ -472,30 +467,62 @@ void scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-
+  int type=2;
   c->proc = 0;
   for (;;)
   {
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
-
-    for (p = proc; p < &proc[NPROC]; p++)
+    if (type==1)
     {
-      acquire(&p->lock);
-      if (p->state == RUNNABLE)
+      for (p = proc; p < &proc[NPROC]; p++)
       {
-        // Switch to chosen process.  It is the process's job
-        // to release its lock and then reacquire it
-        // before jumping back to us.
-        p->state = RUNNING;
-        c->proc = p;
-        swtch(&c->context, &p->context);
+        acquire(&p->lock);
+        if (p->state == RUNNABLE)
+        {
+          // Switch to chosen process.  It is the process's job
+          // to release its lock and then reacquire it
+          // before jumping back to us.
+          p->state = RUNNING;
+          c->proc = p;
+          swtch(&c->context, &p->context);
 
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
+          // Process is done running for now.
+          // It should have changed its p->state before coming back.
+          c->proc = 0;
+        }
+        release(&p->lock);
       }
-      release(&p->lock);
+    }
+    else if (type==2)
+    {
+      int time=__INT_MAX__;
+      struct proc* p_torun=0;
+      for (p=proc;p<&proc[NPROC];p++)
+      {
+        acquire(&p->lock);
+        if (p->state == RUNNABLE)
+        {
+          if (p->ctime<time)
+          {
+            time=p->ctime;
+            p_torun=p;
+          }
+        }
+        release(&p->lock);
+      }
+      if (p_torun!=0)
+      {
+        acquire(&p_torun->lock);
+        if (p_torun->state==RUNNABLE)
+        {
+          p_torun->state = RUNNING;
+          c->proc = p_torun;
+          swtch(&c->context, &p_torun->context);
+          c->proc = 0;
+        }
+        release(&p_torun->lock);
+      }
     }
   }
 }
