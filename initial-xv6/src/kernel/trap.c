@@ -95,7 +95,84 @@ void usertrap(void)
         p->ishandler=1;
       }
     }
-    yield();
+    #ifdef MLFQ
+      struct proc* p =myproc();
+      struct proc* i;
+      for (i = proc; i < &proc[NPROC]; i++)
+      {
+        if (i->state==RUNNABLE&&i->wtime>=30)
+        {
+          i->wtime=0;
+          if (i->nque!=0)
+          {
+            i->nque--;
+          } 
+        }
+      }
+      if (p->nque==0)
+      {
+        if (p->quetick>=1)
+        {
+          p->quetick=0;
+          p->nque++;
+          yield();
+        }
+        if (p->state==SLEEPING)
+        {
+          p->quetick=0;
+          yield();
+        }
+      }
+      if (p->nque==1)
+      {
+        if (p->quetick>=3)
+        {
+          p->quetick=0;
+          p->nque++;
+          yield();
+        }
+        if (p->state==SLEEPING)
+        {
+          p->quetick=0;
+          yield();
+        }
+      }
+      if (p->nque==2)
+      {
+        if (p->quetick>=9)
+        {
+          p->quetick=0;
+          p->nque++;
+          yield();
+        }
+        if (p->state==SLEEPING)
+        {
+          p->quetick=0;
+          yield();
+        }
+      }
+      if (p->nque==3)
+      {
+        if (p->quetick>=15)
+        {
+          p->quetick=0;
+          yield();
+        }
+        if (p->state==SLEEPING)
+        {
+          p->quetick=0;
+          yield();
+        }
+      }
+      if (p->higherque==1)
+      {
+        p->quetick=0;
+        yield();
+      }
+    #endif
+    #ifndef FCFS
+      yield();
+    #endif
   }
 
   usertrapret();
@@ -169,7 +246,11 @@ void kerneltrap()
 
   // give up the CPU if this is a timer interrupt.
   if (which_dev == 2 && myproc() != 0 && myproc()->state == RUNNING)
-    yield();
+    {
+      #ifndef FCFS
+      yield();
+      #endif
+    }
 
   // the yield() may have caused some traps to occur,
   // so restore trap registers for use by kernelvec.S's sepc instruction.
@@ -182,20 +263,21 @@ void clockintr()
   acquire(&tickslock);
   ticks++;
   update_time();
-  // for (struct proc *p = proc; p < &proc[NPROC]; p++)
-  // {
-  //   acquire(&p->lock);
-  //   if (p->state == RUNNING)
-  //   {
-  //     printf("here");
-  //     p->rtime++;
-  //   }
-  //   // if (p->state == SLEEPING)
-  //   // {
-  //   //   p->wtime++;
-  //   // }
-  //   release(&p->lock);
-  // }
+  for (struct proc *p = proc; p < &proc[NPROC]; p++)
+  {
+    acquire(&p->lock);
+    if (p->state==RUNNABLE)
+    {
+      p->wtime++;
+    }
+    else
+    {
+      p->wtime=0;
+    }
+    if (p->state==RUNNABLE||p->state==RUNNING)
+    printf("%d %d %d\n",p->pid,p->nque,ticks);
+    release(&p->lock);
+  }
   wakeup(&ticks);
   release(&tickslock);
 }

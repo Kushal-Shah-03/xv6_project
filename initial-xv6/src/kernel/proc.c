@@ -157,6 +157,10 @@ found:
   p->sighandler=0;
   p->currticks=0;
   p->ishandler=0;
+  p->nque=0;
+  p->quetick=0;
+  p->higherque=0;
+  p->wtime=0;
   return p;
 }
 
@@ -467,7 +471,16 @@ void scheduler(void)
 {
   struct proc *p;
   struct cpu *c = mycpu();
-  int type=2;
+  int type;
+  #ifdef MLFQ
+  type=3;
+  #endif
+  #ifdef FCFS
+  type=2;
+  #endif
+  #ifdef RR
+  type=1;
+  #endif
   c->proc = 0;
   for (;;)
   {
@@ -523,6 +536,76 @@ void scheduler(void)
         }
         release(&p_torun->lock);
       }
+    }
+    else if (type==3)
+    {
+      // yaad rakhje ke in scheduler aj karvu padse coz shit premption and all but thai jase trust
+      int count=0;
+      int nque=0;
+      while (count==0&&nque!=4)
+      {
+        for (p = proc; p < &proc[NPROC]; p++)
+        {
+          int higherque=-1;
+          acquire(&p->lock);
+          if (p->state == RUNNABLE&&p->nque==nque)
+          {
+            // Switch to chosen process.  It is the process's job
+            // to release its lock and then reacquire it
+            // before jumping back to us.
+            while (p->state==RUNNABLE)
+            {
+              p->state = RUNNING;
+              c->proc = p;
+              p->quetick++;
+              // printf("Hi");
+              int quenum=p->nque;
+              swtch(&c->context, &p->context);
+              // Process is done running for now.
+              // It should have changed its p->state before coming back.
+              c->proc = 0;
+              if (p->quetick==0)
+              {
+                break;
+              }
+              release(&p->lock);
+              for (struct proc* i=proc;i<&proc[NPROC];i++)
+              {
+                acquire(&i->lock);
+                if (i->state==RUNNABLE&&i->nque<quenum)
+                {
+                  higherque=i->nque;
+                  quenum=i->nque;
+                }
+                release(&i->lock);
+              }
+              acquire(&p->lock);
+              if (higherque!=-1)
+              {
+                // printf("%d\n",higherque);
+                
+                release(&p->lock);
+                // printf("Hi");
+                break;
+              }
+            }
+            count++;
+            if (higherque!=-1)
+            {
+              nque=higherque-1;
+              higherque=-1;
+              count=0;
+              break;
+            }
+          }
+          release(&p->lock);
+        }
+        if (count==0)
+        {
+          nque++;
+        }
+      }
+
     }
   }
 }
