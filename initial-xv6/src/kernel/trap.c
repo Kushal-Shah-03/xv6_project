@@ -274,8 +274,8 @@ void clockintr()
     {
       p->wtime=0;
     }
-    if (p->state==RUNNABLE||p->state==RUNNING)
-    printf("%d %d %d\n",p->pid,p->nque,ticks);
+    //if (p->state==RUNNABLE||p->state==RUNNING)
+    //printf("%d %d %d\n",p->pid,p->nque,ticks);
     release(&p->lock);
   }
   wakeup(&ticks);
