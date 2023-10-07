@@ -128,6 +128,7 @@ struct proc
   int nque;
   int quetick;
   int higherque;
+  int actuallyrunnable;
 };
 
 extern struct proc proc[NPROC];

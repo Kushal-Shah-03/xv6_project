@@ -161,6 +161,7 @@ found:
   p->quetick=0;
   p->higherque=0;
   p->wtime=0;
+  p->actuallyrunnable=1;
   return p;
 }
 
@@ -493,13 +494,15 @@ void scheduler(void)
         acquire(&p->lock);
         if (p->state == RUNNABLE)
         {
+          // printf("a%da",p->pid);
           // Switch to chosen process.  It is the process's job
           // to release its lock and then reacquire it
           // before jumping back to us.
           p->state = RUNNING;
           c->proc = p;
           swtch(&c->context, &p->context);
-
+          // if(p->state==SLEEPING)
+          // printf("b%db",p->pid);
           // Process is done running for now.
           // It should have changed its p->state before coming back.
           c->proc = 0;
@@ -542,14 +545,17 @@ void scheduler(void)
       // yaad rakhje ke in scheduler aj karvu padse coz shit premption and all but thai jase trust
       int count=0;
       int nque=0;
+      // int currticks=ticks;
       while (count==0&&nque!=4)
       {
         for (p = proc; p < &proc[NPROC]; p++)
         {
           int higherque=-1;
           acquire(&p->lock);
+          if (p->state!=RUNNABLE)
+          p->actuallyrunnable=0;
           if (p->state == RUNNABLE&&p->nque==nque)
-          {
+          { 
             // Switch to chosen process.  It is the process's job
             // to release its lock and then reacquire it
             // before jumping back to us.
@@ -557,10 +563,19 @@ void scheduler(void)
             {
               p->state = RUNNING;
               c->proc = p;
-              p->quetick++;
+              // if (ticks==currticks)
+              // {
+                p->quetick++;
+              //   currticks++;
+              // }
               // printf("Hi");
               int quenum=p->nque;
               swtch(&c->context, &p->context);
+              if (p->state==SLEEPING)
+              p->actuallyrunnable=0;
+              if (p->state==RUNNABLE)
+              p->actuallyrunnable=1;
+              // printf("a%da",p->pid);
               // Process is done running for now.
               // It should have changed its p->state before coming back.
               c->proc = 0;
@@ -572,8 +587,9 @@ void scheduler(void)
               for (struct proc* i=proc;i<&proc[NPROC];i++)
               {
                 acquire(&i->lock);
-                if (i->state==RUNNABLE&&i->nque<quenum)
+                if (i->state==RUNNABLE&&i->nque<quenum&&i->actuallyrunnable==1)
                 {
+                  // printf("b%db",i->pid);
                   higherque=i->nque;
                   quenum=i->nque;
                 }
@@ -583,7 +599,6 @@ void scheduler(void)
               if (higherque!=-1)
               {
                 // printf("%d\n",higherque);
-                
                 release(&p->lock);
                 // printf("Hi");
                 break;
@@ -595,6 +610,7 @@ void scheduler(void)
               nque=higherque-1;
               higherque=-1;
               count=0;
+              // printf("Hi %d",nque);
               break;
             }
           }
@@ -884,6 +900,18 @@ void update_time()
   for (p = proc; p < &proc[NPROC]; p++)
   {
     acquire(&p->lock);
+    if (p->state==RUNNABLE)
+    {
+      // p->actuallyrunnable=1;
+      p->wtime++;
+    }
+    else
+    {
+      // p->actuallyrunnable=0;
+      p->wtime=0;
+    }
+    if ((p->state!=UNUSED&&p->actuallyrunnable==1)||p->state==RUNNING)
+    printf("%d %d %d\n",p->pid,p->nque,ticks);
     if (p->state == RUNNING)
     {
       p->rtime++;
