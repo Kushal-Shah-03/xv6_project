@@ -17,10 +17,10 @@ int main(){
 
   server_sock = socket(AF_INET, SOCK_STREAM, 0);
   if (server_sock < 0){
-    perror("[-]Socket error");
+    perror("Socket error");
     exit(1);
   }
-  printf("[+]TCP server socket created.\n");
+  printf("TCP server socket created.\n");
 
   memset(&server_addr, '\0', sizeof(server_addr));
   server_addr.sin_family = AF_INET;
@@ -34,10 +34,10 @@ int main(){
 
   n = bind(server_sock, (struct sockaddr*)&server_addr, sizeof(server_addr));
   if (n < 0){
-    perror("[-]Bind error");
+    perror("Bind error");
     exit(1);
   }
-  printf("[+]Bind to the port number: %d\n", port);
+  printf("Bind to the port number: %d\n", port);
 
   if (listen(server_sock, 5)==-1)
   {
@@ -63,7 +63,16 @@ int main(){
       exit(1);
     }
     printf("Client: %s\n", buffer);
-
+    if (strcmp(buffer,"exit")==0||buffer[0]=='\0')
+    {
+      if (close(client_sock)==-1)
+      {
+        perror("Close Error");
+        exit(1);
+      }
+      printf("Client disconnected.\n\n");
+      exit(0);
+    }
     bzero(buffer, 1024);
     printf("Send Message: ");
     scanf("%s",buffer);
@@ -78,7 +87,7 @@ int main(){
       perror("Close Error");
       exit(1);
     }
-    printf("[+]Client disconnected.\n\n");
+    printf("Client disconnected.\n\n");
 
   }
 

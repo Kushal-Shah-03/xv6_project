@@ -18,32 +18,34 @@ struct Data
   char s5;
   int npackets;
   int currpacket;
+  int msgno;
 };
 
 int main(int argc, char **argv)
 {
+  int msgno=0;
   int send = 1;
   int recv = 0;
   int flagging = 0;
-  if (send == 1)
-  {
+
+
     char *ip = "127.0.0.1";
     int port = 5600;
 
-    int sockfd;
+    int sockfdsend;
     struct sockaddr_in addr;
     char buffer[1024];
-    socklen_t addr_size;
+    socklen_t addr_sizesend=sizeof(addr);
 
-    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sockfd < 0)
+    sockfdsend = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfdsend < 0)
     {
       perror("Socket error");
       exit(1);
     }
-    int flags = fcntl(sockfd, F_GETFL);
+    int flags = fcntl(sockfdsend, F_GETFL);
     flags |= O_NONBLOCK;
-    fcntl(sockfd, F_SETFL, flags);
+    fcntl(sockfdsend, F_SETFL, flags);
     memset(&addr, '\0', sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
@@ -53,6 +55,41 @@ int main(int argc, char **argv)
       perror("inet_addr error");
       exit(1);
     }
+
+    port = 5601;
+
+    int sockfdrecv;
+    struct sockaddr_in server_addr, client_addr;
+    // char buffer[1024];
+    socklen_t addr_sizerecv=sizeof(client_addr);
+    int n;
+
+    sockfdrecv = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfdrecv < 0)
+    {
+      perror("socket error");
+      exit(1);
+    }
+    flags = fcntl(sockfdrecv, F_GETFL);
+    flags |= O_NONBLOCK;
+    fcntl(sockfdrecv, F_SETFL, flags);
+
+    memset(&server_addr, '\0', sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(port);
+    server_addr.sin_addr.s_addr = inet_addr(ip);
+    if (server_addr.sin_addr.s_addr == -1)
+    {
+      perror("inet_addr error");
+      exit(1);
+    }
+  while(1)
+  {
+  if (send == 1)
+  {
+    int sockfd=sockfdsend;
+    int port=5600;
+    socklen_t addr_size=addr_sizesend;
     scanf("%s", buffer);
     int datalen = strlen(buffer);
     for (int i = 0; i < 5; i++)
@@ -79,6 +116,7 @@ int main(int argc, char **argv)
       Data[i]->s3 = buffer[i * 5 + 2];
       Data[i]->s4 = buffer[i * 5 + 3];
       Data[i]->s5 = buffer[i * 5 + 4];
+      Data[i]->msgno=msgno;
     }
     int Sent[npackets];
     for (int i = 0; i < npackets; i++)
@@ -169,35 +207,9 @@ int main(int argc, char **argv)
   }
   if (recv == 1)
   {
-    int port = 5601;
-
-    char *ip = "127.0.0.1";
-
-    int sockfd;
-    struct sockaddr_in server_addr, client_addr;
-    char buffer[1024];
-    socklen_t addr_size;
-    int n;
-
-    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sockfd < 0)
-    {
-      perror("socket error");
-      exit(1);
-    }
-    int flags = fcntl(sockfd, F_GETFL);
-    flags |= O_NONBLOCK;
-    fcntl(sockfd, F_SETFL, flags);
-
-    memset(&server_addr, '\0', sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(port);
-    server_addr.sin_addr.s_addr = inet_addr(ip);
-    if (server_addr.sin_addr.s_addr == -1)
-    {
-      perror("inet_addr error");
-      exit(1);
-    }
+    int sockfd=sockfdrecv;
+    int port=5601;
+    socklen_t addr_size=addr_sizerecv;
     if (flagging == 0)
     {
       n = bind(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr));
@@ -229,7 +241,7 @@ int main(int argc, char **argv)
           exit(1);
         }
       }
-      if (flag == 1)
+      if (flag == 1&&Data1->msgno==msgno)
       {
         break;
       }
@@ -267,7 +279,7 @@ int main(int argc, char **argv)
             exit(1);
           }
         }
-        if (flag == 1)
+        if (flag == 1&&msgno==Data1->msgno)
         {
           break;
         }
@@ -303,6 +315,8 @@ int main(int argc, char **argv)
     recv = 0;
     send = 1;
   }
+  msgno++;
   // printf("[+]Data sent: %s\n", buffer);
+  }
   return 0;
 }

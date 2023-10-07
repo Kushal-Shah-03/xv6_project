@@ -51,7 +51,7 @@ int main(int argc, char **argv){
     perror("recvfrom error");
     exit(1);
   }
-  printf("[+]Data recv: %s\n", buffer);
+  printf("Msg recv: %s\n", buffer);
 
   bzero(buffer, 1024);
   // strcpy(buffer, "Welcome to the UDP Server.");
@@ -62,7 +62,6 @@ int main(int argc, char **argv){
     perror("sendto error");
     exit(1);
   }
-  // printf("[+]Data send: %s\n", buffer);
 
   return 0;
 }

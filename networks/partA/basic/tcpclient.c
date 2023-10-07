@@ -17,10 +17,10 @@ int main(){
 
   sock = socket(AF_INET, SOCK_STREAM, 0);
   if (sock < 0){
-    perror("[-]Socket error");
+    perror("Socket error");
     exit(1);
   }
-  printf("[+]TCP server socket created.\n");
+  printf("TCP server socket created.\n");
 
   memset(&addr, '\0', sizeof(addr));
   addr.sin_family = AF_INET;

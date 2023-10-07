@@ -54,7 +54,7 @@ int main(int argc, char **argv){
     perror("Recvfrom error");
     exit(1);
   }
-  printf("[+]Data recv: %s\n", buffer);
+  printf("Msg recv: %s\n", buffer);
 
   return 0;
 }
