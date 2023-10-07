@@ -40,8 +40,9 @@ int main(){
   printf("Connected to the server.\n");
 
   bzero(buffer, 1024);
-  strcpy(buffer, "HELLO, THIS IS CLIENT.");
-  printf("Client: %s\n", buffer);
+  // strcpy(buffer, "HELLO, THIS IS CLIENT.");
+  printf("Send Message: ");
+  scanf("%s",buffer);
   if (send(sock, buffer, strlen(buffer), 0)==-1)
   {
     perror("Send error");

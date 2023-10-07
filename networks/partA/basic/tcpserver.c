@@ -54,8 +54,8 @@ int main(){
       perror("Accept error");
       exit(1);
     }
-    printf("[+]Client connected.\n");
-
+    printf("Client connected.\n");
+    
     bzero(buffer, 1024);
     if (recv(client_sock, buffer, sizeof(buffer), 0)==-1)
     {
@@ -65,8 +65,8 @@ int main(){
     printf("Client: %s\n", buffer);
 
     bzero(buffer, 1024);
-    strcpy(buffer, "HI, THIS IS SERVER. HAVE A NICE DAY!!!");
-    printf("Server: %s\n", buffer);
+    printf("Send Message: ");
+    scanf("%s",buffer);
     if (send(client_sock, buffer, strlen(buffer), 0)==-1)
     {
       perror("Send Error");

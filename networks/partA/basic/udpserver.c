@@ -54,13 +54,15 @@ int main(int argc, char **argv){
   printf("[+]Data recv: %s\n", buffer);
 
   bzero(buffer, 1024);
-  strcpy(buffer, "Welcome to the UDP Server.");
+  // strcpy(buffer, "Welcome to the UDP Server.");
+  printf("Send Message: ");
+  scanf("%s",buffer);
   if (sendto(sockfd, buffer, 1024, 0, (struct sockaddr*)&client_addr, sizeof(client_addr))==-1)
   {
     perror("sendto error");
     exit(1);
   }
-  printf("[+]Data send: %s\n", buffer);
+  // printf("[+]Data send: %s\n", buffer);
 
   return 0;
 }

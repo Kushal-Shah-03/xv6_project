@@ -37,13 +37,15 @@ int main(int argc, char **argv){
   }
 
   bzero(buffer, 1024);
-  strcpy(buffer, "Hello, World!");
+  // strcpy(buffer, "Hello, World!");
+  printf("Send Message: ");
+  scanf("%s",buffer);
   if (sendto(sockfd, buffer, 1024, 0, (struct sockaddr*)&addr, sizeof(addr))==-1)
   {
     perror("Sendto error");
     exit(1);
   }
-  printf("[+]Data send: %s\n", buffer);
+  // printf("[+]Data send: %s\n", buffer);
 
   bzero(buffer, 1024);
   addr_size = sizeof(addr);
