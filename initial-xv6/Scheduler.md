@@ -31,9 +31,9 @@ To implement MLFQ in xv6:
 
 1. Introduce the following variables in struct proc in proc.c, these will help to store the required information about the process, to implement MLFQ
 
-    int nque; -  queue number
-    int quetick; - runtime in that queue (resets everytime process changes queue or another process get's scheduled)
-    int wtime; - the time (in ticks) elapsed since the last time the process ran
+   - int nque; -  queue number
+   - int quetick; - runtime in that queue (resets everytime process changes queue or another process get's scheduled)
+   - int wtime; - the time (in ticks) elapsed since the last time the process ran
 
 2. In void scheduler() in proc.c check for the highest priority occupied queue, by iterating through the proc array, trying to find the queue with the queue indexed 0 (max priority), and so on till we find a runnable process with the lowest priority in the queue, execute it, when the process get's preempted and comes back, again check if there is any other process with higher priority, if not execute the process again.
 
@@ -47,9 +47,9 @@ NOTE: To run MLFQ, run "make qemu SCHEDULER=MLFQ"
 
 On running schedulertest
 
-RR - Rtime = 16 Wtime = 166
-MLFQ - Rtime = 18 Wtime = 169
-FCFS - Rtime = 20 Wtime = 137 
+- RR - Rtime = 16 Wtime = 166
+- MLFQ - Rtime = 18 Wtime = 169
+- FCFS - Rtime = 20 Wtime = 137 
 
 FCFS has the lowest wtime, this is because it schedules the process that arrive earlier, leading to less wtime as they get executed quicker.
 
