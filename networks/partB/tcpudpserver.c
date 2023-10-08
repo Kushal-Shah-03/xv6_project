@@ -221,7 +221,7 @@ int main(int argc, char **argv)
       int flag = 0;
       for (int i = 0; i < npackets; i++)
       {
-        Data[i] = malloc(sizeof(Data));
+        Data[i] = malloc(sizeof(struct Data));
         Data[i]->npackets = npackets;
         Data[i]->currpacket = i;
         Data[i]->s1 = buffer[i * 5];

@@ -4,6 +4,8 @@
         "user.h": "c",
         "sleeplock.h": "c",
         "proc.h": "c",
-        "defs.h": "c"
+        "defs.h": "c",
+        "string.h": "c",
+        "stdio.h": "c"
     }
 }

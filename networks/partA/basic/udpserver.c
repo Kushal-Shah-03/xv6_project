@@ -8,13 +8,13 @@
 
 int main(int argc, char **argv){
 
-  if (argc != 2){
-    printf("Usage: %s <port>\n", argv[0]);
-    exit(0);
-  }
+  // if (argc != 2){
+  //   printf("Usage: %s <port>\n", argv[0]);
+  //   exit(0);
+  // }
 
   char *ip = "127.0.0.1";
-  int port = atoi(argv[1]);
+  int port = 5900;
 
   int sockfd;
   struct sockaddr_in server_addr, client_addr;
