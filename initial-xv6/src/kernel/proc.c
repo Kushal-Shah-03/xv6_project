@@ -565,24 +565,23 @@ void scheduler(void)
               c->proc = p;
               // if (ticks==currticks)
               // {
-                p->quetick++;
+                // p->quetick++;
               //   currticks++;
               // }
               // printf("Hi");
               int quenum=p->nque;
               swtch(&c->context, &p->context);
               if (p->state==SLEEPING)
-              p->actuallyrunnable=0;
+              {
+                p->actuallyrunnable=0;
+                p->wtime=0;
+              }
               if (p->state==RUNNABLE)
               p->actuallyrunnable=1;
               // printf("a%da",p->pid);
               // Process is done running for now.
               // It should have changed its p->state before coming back.
               c->proc = 0;
-              if (p->quetick==0)
-              {
-                break;
-              }
               release(&p->lock);
               for (struct proc* i=proc;i<&proc[NPROC];i++)
               {
@@ -601,6 +600,10 @@ void scheduler(void)
                 // printf("%d\n",higherque);
                 release(&p->lock);
                 // printf("Hi");
+                break;
+              }
+              if (p->quetick==0)
+              {
                 break;
               }
             }
@@ -914,6 +917,8 @@ void update_time()
     printf("%d %d %d\n",p->pid,p->nque,ticks);
     if (p->state == RUNNING)
     {
+      // printf("a%da\n",p->pid);
+      p->quetick++;
       p->rtime++;
     }
     release(&p->lock);

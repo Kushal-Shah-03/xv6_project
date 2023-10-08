@@ -100,7 +100,7 @@ void usertrap(void)
       struct proc* i;
       for (i = proc; i < &proc[NPROC]; i++)
       {
-        if (i->state==RUNNABLE&&i->actuallyrunnable==1&&i->wtime>=30)
+        if ((i->state==RUNNABLE||i->state==RUNNING)&&i->wtime>=30)
         {
           i->wtime=0;
           if (i->nque!=0)
@@ -111,7 +111,7 @@ void usertrap(void)
       }
       if (p->nque==0)
       {
-        if (p->quetick>1)
+        if (p->quetick>=1)
         {
           p->quetick=0;
           p->nque++;
@@ -125,7 +125,7 @@ void usertrap(void)
       }
       if (p->nque==1)
       {
-        if (p->quetick>3)
+        if (p->quetick>=3)
         {
           p->quetick=0;
           p->nque++;
@@ -139,7 +139,7 @@ void usertrap(void)
       }
       if (p->nque==2)
       {
-        if (p->quetick>9)
+        if (p->quetick>=9)
         {
           p->quetick=0;
           p->nque++;
@@ -153,7 +153,7 @@ void usertrap(void)
       }
       if (p->nque==3)
       {
-        if (p->quetick>15)
+        if (p->quetick>=15)
         {
           p->quetick=0;
           yield();
