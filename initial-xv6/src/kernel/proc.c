@@ -159,7 +159,7 @@ found:
   p->ishandler=0;
   p->nque=0;
   p->quetick=0;
-  p->higherque=0;
+  // p->higherque=0;
   p->wtime=0;
   p->actuallyrunnable=1;
   return p;

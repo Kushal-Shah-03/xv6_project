@@ -184,7 +184,7 @@ int main(int argc, char **argv)
       {
         printf("%c%c%c%c%c", Data[i].s1, Data[i].s2, Data[i].s3, Data[i].s4, Data[i].s5);
       }
-      printf("\n");
+      // printf("\n");
       // printf("[+]Data recv: %s\n", buffer);
 
       // bzero(buffer, 1024);
@@ -203,7 +203,7 @@ int main(int argc, char **argv)
       int port=5601;
       int sockfd=sockfdsend;
       socklen_t addr_size=addr_sizesend;
-      scanf("%s", buffer);
+      fgets(buffer,1024,stdin);
       int datalen = strlen(buffer);
       for (int i = 0; i < 5; i++)
       {

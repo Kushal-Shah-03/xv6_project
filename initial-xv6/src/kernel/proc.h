@@ -127,7 +127,7 @@ struct proc
   int ishandler;
   int nque;
   int quetick;
-  int higherque;
+  // int higherque;
   int actuallyrunnable;
 };
 

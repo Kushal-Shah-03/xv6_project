@@ -164,11 +164,11 @@ void usertrap(void)
           yield();
         }
       }
-      if (p->higherque==1)
-      {
-        p->quetick=0;
-        yield();
-      }
+      // if (p->higherque==1)
+      // {
+      //   p->quetick=0;
+      //   yield();
+      // }
     #endif
     #ifndef FCFS
       yield();
