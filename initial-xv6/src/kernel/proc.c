@@ -913,8 +913,8 @@ void update_time()
       // p->actuallyrunnable=0;
       p->wtime=0;
     }
-    if ((p->state!=UNUSED&&p->actuallyrunnable==1)||p->state==RUNNING)
-    printf("%d %d %d\n",p->pid,p->nque,ticks);
+    // if ((p->state!=UNUSED&&p->actuallyrunnable==1)||p->state==RUNNING)
+    // printf("%d %d %d\n",p->pid,p->nque,ticks);
     if (p->state == RUNNING)
     {
       // printf("a%da\n",p->pid);

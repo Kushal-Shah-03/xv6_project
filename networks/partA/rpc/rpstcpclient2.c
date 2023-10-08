@@ -56,6 +56,7 @@ int main()
                 exit(1);
             }
             printf("Disconnected from the server.\n");
+            exit(0);
         }  
         printf("Server: %s\n", buffer);
         scanf("%s",buffer);
@@ -63,6 +64,16 @@ int main()
         {
             perror("Send error");
             exit(1);
+        }
+        if (strcmp(buffer,"exit")==0)
+        {
+            if (close(sock) == -1)
+            {
+                perror("Close error");
+                exit(1);
+            }
+            printf("Disconnected from the server.\n");
+            exit(0);
         }
     }
 

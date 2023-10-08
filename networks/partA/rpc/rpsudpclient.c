@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 int main(int argc, char **argv)
 {
@@ -32,13 +33,13 @@ int main(int argc, char **argv)
         exit(1);
     }
     bzero(buffer, 1024);
-    strcpy(buffer, "Hello, World!");
+    strcpy(buffer, "Play");
     if (sendto(sockfd, buffer, 1024, 0, (struct sockaddr *)&addr, sizeof(addr)) == -1)
     {
         perror("Sendto error");
         exit(1);
     }
-    printf("[+]Data send: %s\n", buffer);
+    // printf("[+]Data send: %s\n", buffer);
 
     bzero(buffer, 1024);
     addr_size = sizeof(addr);
@@ -52,8 +53,13 @@ int main(int argc, char **argv)
         }
         if (strcmp(buffer, "exit") == 0)
         {
+            if (close(sockfd) == -1)
+            {
+                perror("Close error");
+                exit(1);
+            }
             printf("Disconnected from the server.\n");
-            exit(1);
+            exit(0);
         }
         printf("Server: %s\n", buffer);
         scanf("%s", buffer);
@@ -61,6 +67,15 @@ int main(int argc, char **argv)
         {
             perror("sendto error");
             exit(1);
+        }
+        if (strcmp(buffer,"exit")==0)
+        {
+            if (close(sockfd) == -1)
+            {
+                perror("Close error");
+                exit(1);
+            }
+            exit(0);
         }
     }
     // if (recvfrom(sockfd, buffer, 1024, 0, (struct sockaddr *)&addr, &addr_size) == -1)

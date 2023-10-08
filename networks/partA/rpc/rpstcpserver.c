@@ -141,15 +141,19 @@ int main()
                 perror("Close Error");
                 exit(1);
             }
-            printf("[+]Client disconnected.\n\n");
-            addr_size = sizeof(client_addr);
-            client_sock = accept(server_sock, (struct sockaddr *)&client_addr, &addr_size);
-            if (client_sock == -1)
+            printf("Client 1 disconnected.\n\n");
+            strcpy(buffer,"exit");
+            if (send(client_sock2, buffer, strlen(buffer), 0) == -1)
             {
-                perror("Accept error");
+                perror("Send Error");
                 exit(1);
             }
-            printf("Client 1 connected.\n");
+            if (close(client_sock2) == -1)
+            {
+                perror("Close Error");
+                exit(1);
+            }
+            exit(0);
         }
         bzero(buffer2, 1024);
         strcpy(client1,buffer);
@@ -166,15 +170,19 @@ int main()
                 perror("Close Error");
                 exit(1);
             }
-            printf("[+]Client disconnected.\n\n");
-            addr_size2 = sizeof(client_addr2);
-            client_sock2 = accept(server_sock2, (struct sockaddr *)&client_addr2, &addr_size2);
-            if (client_sock2 == -1)
+            printf("Client 2 disconnected.\n\n");
+            strcpy(buffer,"exit");
+            if (send(client_sock, buffer, strlen(buffer), 0) == -1)
             {
-                perror("Accept error");
+                perror("Send Error");
                 exit(1);
             }
-            printf("Client 2 connected.\n");
+            if (close(client_sock) == -1)
+            {
+                perror("Close Error");
+                exit(1);
+            }
+            exit(0);
         }
         strcpy(client2,buffer2);
         if (client1[0]!='\0'&&client2[0]!='\0')
@@ -200,6 +208,7 @@ int main()
                 }
                 else if ((strcmp(client2,"Rock")==0&&strcmp(client1,"Paper")==0)||(strcmp(client2,"Paper")==0&&strcmp(client1,"Scissor")==0)||(strcmp(client2,"Scissor")==0&&strcmp(client1,"Rock")==0))
                 {
+                    printf("Client 1 Wins\n");
                     strcpy(buffer,"You Win\n To play again type yes or To quit type exit");
                     if (send(client_sock, buffer, strlen(buffer), 0) == -1)
                     {
@@ -231,8 +240,17 @@ int main()
                         perror("Send Error");
                         exit(1);
                     }
-                    close(server_sock2);
-                    close(server_sock);
+                    if (close(server_sock) == -1)
+                    {
+                        perror("Close Error");
+                        exit(1);
+                    }
+                    if (close(server_sock2) == -1)
+                    {
+                        perror("Close Error");
+                        exit(1);
+                    }
+                    exit(0);
                 }
             }
             

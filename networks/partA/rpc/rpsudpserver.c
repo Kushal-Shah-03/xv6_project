@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 int main(int argc, char **argv)
 {
@@ -79,14 +80,14 @@ int main(int argc, char **argv)
         perror("recvfrom error");
         exit(1);
     }
-    printf("[+]Data recv: %s\n", buffer);
+    printf("Client1: %s\n", buffer);
     addr_size2 = sizeof(client_addr2);
     if (recvfrom(sockfd2, buffer2, 1024, 0, (struct sockaddr *)&client_addr2, &addr_size2) == -1)
     {
         perror("recvfrom error");
         exit(1);
     }
-    printf("[+]Data recv: %s\n", buffer2);
+    printf("Client2: %s\n", buffer2);
 
     bzero(buffer, 1024);
     bzero(buffer2, 1024);
@@ -121,7 +122,23 @@ int main(int argc, char **argv)
         printf("Client1: %s\n", buffer);
         if (strcmp(buffer, "exit") == 0)
         {
-            exit(1);
+            strcpy(buffer,"exit");
+            if (sendto(sockfd2, buffer, 1024, 0, (struct sockaddr *)&client_addr2, sizeof(client_addr2)) == -1)
+            {
+                perror("sendto error");
+                exit(1);
+            }
+            if (close(sockfd) == -1)
+            {
+                perror("Close error");
+                exit(1);
+            }
+            if (close(sockfd2) == -1)
+            {
+                perror("Close error");
+                exit(1);
+            }
+            exit(0);
         }
         bzero(buffer2, 1024);
         strcpy(client1, buffer);
@@ -133,8 +150,24 @@ int main(int argc, char **argv)
         printf("Client2: %s\n", buffer2);
         if (strcmp(buffer2, "exit") == 0)
         {
+            strcpy(buffer,"exit");
+            if (sendto(sockfd, buffer, 1024, 0, (struct sockaddr *)&client_addr, sizeof(client_addr)) == -1)
+            {
+                perror("sendto error");
+                exit(1);
+            }
+            if (close(sockfd) == -1)
+            {
+                perror("Close error");
+                exit(1);
+            }
+            if (close(sockfd2) == -1)
+            {
+                perror("Close error");
+                exit(1);
+            }
             printf("[+]Client disconnected.\n\n");
-            exit(1);
+            exit(0);
         }
         strcpy(client2, buffer2);
         if (client1[0] != '\0' && client2[0] != '\0')
@@ -160,6 +193,7 @@ int main(int argc, char **argv)
                 }
                 else if ((strcmp(client2, "Rock") == 0 && strcmp(client1, "Paper") == 0) || (strcmp(client2, "Paper") == 0 && strcmp(client1, "Scissor") == 0) || (strcmp(client2, "Scissor") == 0 && strcmp(client1, "Rock") == 0))
                 {
+                    printf("Client 1 Wins\n");
                     strcpy(buffer, "You Win\n To play again type yes or To quit type exit");
                     if (sendto(sockfd, buffer, 1024, 0, (struct sockaddr *)&client_addr, sizeof(client_addr)) == -1)
                     {
@@ -174,11 +208,7 @@ int main(int argc, char **argv)
                     }
                     playing = 0;
                 }
-            }
-            else if (playing == 0)
-            {
-                playing = 1;
-                if (strcmp(client1, "yes") != 0 && strcmp(client2, "yes") != 0)
+                else
                 {
                     strcpy(buffer, "exit");
                     if (sendto(sockfd, buffer, 1024, 0, (struct sockaddr *)&client_addr, sizeof(client_addr)) == -1)
@@ -189,6 +219,45 @@ int main(int argc, char **argv)
                     if (sendto(sockfd2, buffer, 1024, 0, (struct sockaddr *)&client_addr2, sizeof(client_addr2)) == -1)
                     {
                         perror("sendto error");
+                        exit(1);
+                    }
+                    if (close(sockfd) == -1)
+                    {
+                        perror("Close error");
+                        exit(1);
+                    }
+                    if (close(sockfd2) == -1)
+                    {
+                        perror("Close error");
+                        exit(1);
+                    }
+                    exit(1);
+                }
+            }
+            else if (playing == 0)
+            {
+                playing = 1;
+                if (strcmp(client1, "yes") != 0 || strcmp(client2, "yes") != 0)
+                {
+                    strcpy(buffer, "exit");
+                    if (sendto(sockfd, buffer, 1024, 0, (struct sockaddr *)&client_addr, sizeof(client_addr)) == -1)
+                    {
+                        perror("sendto error");
+                        exit(1);
+                    }
+                    if (sendto(sockfd2, buffer, 1024, 0, (struct sockaddr *)&client_addr2, sizeof(client_addr2)) == -1)
+                    {
+                        perror("sendto error");
+                        exit(1);
+                    }
+                    if (close(sockfd) == -1)
+                    {
+                        perror("Close error");
+                        exit(1);
+                    }
+                    if (close(sockfd2) == -1)
+                    {
+                        perror("Close error");
                         exit(1);
                     }
                     exit(1);
